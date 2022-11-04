@@ -55,8 +55,8 @@ create table Performance(
 create table PerformanceTiming(
 	performanceTimingID int primary key auto_increment,
 	performanceID int,
-	dateTimeOfPerformance dateTime,
-	duration time,
+	dateTimeOfPerformance dateTime not null,
+	duration time not null,
 	foreign key (performanceID) references performance(performanceID) on delete cascade
 );
 
@@ -83,6 +83,13 @@ create procedure insertPerformanceType (in aPerformanceTypeName varchar(30))
 	begin
 		insert into PerformanceType(performanceTypeName) values (aPerformanceTypeName);
 	end;
+/
+
+create procedure insertPurchase(in aUserID int, in aQuantity int, out aPurchaseID int)
+	begin
+		insert into Purchase(userID, quantity) values (aUserID, aQuantity);
+        	set aPurchaseID = last_insert_id();
+	end;	
 /
 
 create procedure insertLanguage(in aLanguageOption varchar(30))
@@ -119,6 +126,8 @@ create procedure insertSeatTypePrice
 	end;
 /
 
+-- more complex procedures
+
 create procedure searchForPerformances(in searchWord varchar(100), in aFromDate date, in aToDate date)
 	begin
 		if aFromDate is null and aToDate is null then
@@ -149,30 +158,19 @@ create procedure getPerformanceTitle (in aPerformanceTimingID int)
         end;
 /
 
-/* create procedure buyTickets(in aSeatLocation varchar(6), in aUserID int, in aPerformanceTimingID int, in aTicketPrice int, in aMaxNumberOfSeats int, in quantity int)
-    begin
-        declare ticketsSold, seatsRemaining int;
-        declare errorMsg varchar(100);
-        select seatAmount into seatsRemaining from SeatTypePrice where seatType = aSeatLocation;
-        set seatsRemainingAfterPurchase = seatsRemaining - quantity;
-        -- raise an exception if customer tries to but more tickets than are available.
-        -- dont sell any at all if they want to buy more than is available.
-        if ticketsRemaining >= quantity then
-            call insertPurchase();
-        else
-            signal sqlstate "45000" set message_text = concat(ticketsRemaining, " tickets remaining. Unable to complete purchase.");
-            addToTickets: loop
-                if quantity = 0 then
-                    leave addToTickets;
-                end if;
-                call insertTicket(aSeatLocation, aUserID, aPerformanceTimingID, aTicketPrice);
-                set quantity = quantity - 1;
-            end loop addToTickets;
-        end if;
-    end;
-    
-    */
+create procedure checkAvailableSeats(in aSeatLocation varchar(6), in aPerformanceTimingID int, in quantity int, out isValid boolean)
+	begin
+		declare seatsRemaining int;
+		select seatAmount into seatsRemaining from SeatTypePrice where seatType = aSeatLocation and performanceTimingID = aPerformanceTimingID;
+        if seatsRemaining >= quantity then
+			set isValid = true;
+		else
+			set isValid = false;
+		end if;
+	end;
 /
+
+
 delimiter ;
 
 Call insertUser('nathandrake@gmail.com', 'Fortune$$001', '1985-08-23', '123 Grove Lane');
