@@ -4,8 +4,8 @@ use TheatreRoyal;
 
 
 create table User (
-	emailAddress varchar(100) primary key NOT NULL,
-	password varchar(50) NOT NULL,
+	emailAddress varchar(100) primary key not null,
+	password varchar(50) not null,
 	DOB date not null,
 	homeAddress varchar(100) not null,
     	constraint emailconst check (emailAddress like '%_@_%._%')
@@ -24,19 +24,10 @@ create table Purchase(
 	foreign key (emailAddress) references User(emailAddress)
 );
 
-create table Ticket(
-    	ticketID int primary key auto_increment,
-    	purchaseID int,
-    	performanceTimingID int,
-    	ticketPrice decimal(5, 2) not null,
-    	foreign key (purchaseID) references Purchase(purchaseID) on delete cascade,
-    	foreign key (performanceTimingID) references PerformanceTiming(performanceTimingID) on delete cascade
-);
-
 create table Language(
 	languageID int primary key auto_increment,
-	languageOption VARCHAR(30)
-	constraint langOptCheck check (languageOption) in ('English', 'Multiple Languages', 'No Languages')
+	languageOption VARCHAR(30),
+	constraint langOptCheck check (languageOption in ('English', 'Multiple Languages', 'No Language'))
 );
 
 create table Performance(
@@ -58,6 +49,15 @@ create table PerformanceTiming(
 	dateTimeOfPerformance dateTime not null,
 	duration time not null,
 	foreign key (performanceID) references performance(performanceID) on delete cascade
+);
+
+create table Ticket(
+    	ticketID int primary key auto_increment,
+    	purchaseID int,
+    	performanceTimingID int,
+    	ticketPrice decimal(5, 2) not null,
+    	foreign key (purchaseID) references Purchase(purchaseID) on delete cascade,
+    	foreign key (performanceTimingID) references PerformanceTiming(performanceTimingID) on delete cascade
 );
 
 create table SeatTypePrice(
@@ -153,8 +153,8 @@ create procedure searchForPerformances(in searchWord varchar(100), in aFromDate 
 
 create procedure getPerformanceTitle (in aPerformanceTimingID int)
 		begin
-			select title from Performance join PerformanceTiming on Performance.performanceID = PerformanceTiming.performanceID 
-				where performanceTimingID = aPerformanceTimingID distinct;
+			select distinct title from Performance join PerformanceTiming on Performance.performanceID = PerformanceTiming.performanceID 
+				where performanceTimingID = aPerformanceTimingID ;
         end;
 /
 
@@ -201,9 +201,9 @@ Call insertPerformance(2, 2, 'La bohème', 'La bohème is an opera in four acts,
 Call insertPerformance(2, 2, 'L''Orfeo', 'L''Orfeo, sometimes called La favola d''Orfeo, is a late Renaissance/early Baroque favola in musica, or opera, by Claudio Monteverdi, with a libretto by Alessandro Striggio.', false,'http://archive.simonkeenlyside.info/wp-content/uploads/2010/02/Orfeo_DVD.jpg');
 
 Call insertPerformance(3, 1, 'Coldplay', 'Coldplay are a British rock band formed in London in 1996. They consist of vocalist and pianist Chris Martin, guitarist Jonny Buckland, bassist Guy Berryman, drummer Will Champion and creative director Phil Harvey.', true, 'https://www.artelino.com/auctionimages/items/15480g1.jpg');
-Call insertPerformance(3, 1, 'Arctic Monkeys', 'Arctic Monkeys are an English rock band formed in Sheffield in 2002. The group consists of Alex Turner, Jamie Cook, Nick O''Malley, and Matt Helders.', true, 'https://www.defining.co/wp-content/uploads/2022/09/ScreenShot2020-12-16at10.47.21AM_ad3a1a7e-bc1a-40ef-bb3b-1d68efcaf6d1.png);
+Call insertPerformance(3, 1, 'Arctic Monkeys', 'Arctic Monkeys are an English rock band formed in Sheffield in 2002. The group consists of Alex Turner, Jamie Cook, Nick O''Malley, and Matt Helders.', true, 'https://www.defining.co/wp-content/uploads/2022/09/ScreenShot2020-12-16at10.47.21AM_ad3a1a7e-bc1a-40ef-bb3b-1d68efcaf6d1.png');
 Call insertPerformance(3, 2, 'Stromae', 'Paul Van Haver, better known by his stage name Stromae, is a Belgian singer, rapper, songwriter and producer. He is mostly known for his works in the genre of the hip hop and electronic music.', true, 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/6cf1ec7f-3236-4b9f-bc84-bc2c6e13392d/d7gwyb3-468a7eb7-7a0e-4cf8-b250-89f916d652ea.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzZjZjFlYzdmLTMyMzYtNGI5Zi1iYzg0LWJjMmM2ZTEzMzkyZFwvZDdnd3liMy00NjhhN2ViNy03YTBlLTRjZjgtYjI1MC04OWY5MTZkNjUyZWEucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.6-SUMu7DJKS0xzS4ervH0IzPZAavNuV7PvpZy_w9Xeg');
-Call insertPerformance(3, 2, 'Bad Bunny', 'Bad Bunny, is a Puerto Rican rapper and singer. His music is defined as Latin trap and reggaeton. He rose to popularity in 2016 with his song "Diles".', true, 'https://toppng.com/uploads/preview/bad-bunny-11563057304ffa9k87zf6.png);
+Call insertPerformance(3, 2, 'Bad Bunny', 'Bad Bunny, is a Puerto Rican rapper and singer. His music is defined as Latin trap and reggaeton. He rose to popularity in 2016 with his song "Diles".', true, 'https://toppng.com/uploads/preview/bad-bunny-11563057304ffa9k87zf6.png');
 Call insertPerformance(3, 1, 'Stormzy', 'Stormzy, is a British rapper, singer and songwriter. In 2014, he gained attention on the UK underground music scene through his Wicked Skengman series of freestyles over classic grime beats.', true, 'https://www.defining.co/wp-content/uploads/2022/09/Stormzy_UKStreets_Poster.png');
 
 Call insertPerformance(4, 1, 'Romeo and Juliet', 'Romeo and Juliet is a tragedy written by William Shakespeare early in his career about two young Italian star-crossed lovers whose deaths ultimately reconcile their feuding families.', true, 'https://kbimages1-a.akamaihd.net/ca07820a-192c-4ec8-a3a6-684a3a7ee2e3/353/569/90/False/romeo-and-juliet-320.jpg');
