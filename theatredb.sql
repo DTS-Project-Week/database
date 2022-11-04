@@ -4,13 +4,11 @@ use TheatreRoyal;
 
 
 create table User (
-	userID INT PRIMARY KEY auto_increment,
-	emailAddress VARCHAR(50) NOT NULL,
-	password VARCHAR(50) NOT NULL,
+	emailAddress varchar(100) primary key NOT NULL,
+	password varchar(50) NOT NULL,
 	DOB date not null,
 	homeAddress varchar(100) not null,
-    constraint emailconst check (emailAddress like '%_@__%.__%')
-    -- constraint will be added for password based on client requirements
+    	constraint emailconst check (emailAddress like '%_@_%._%')
 );
 
 create table PerformanceType(
@@ -21,54 +19,55 @@ create table PerformanceType(
 
 create table Purchase(
 	purchaseID int primary key auto_increment,
-    userID int,
-    foreign key (userID) references User(userID),
-    quantity int
+    	emailAddress varchar(100) not null,
+    	quantity int not null,
+	foreign key (emailAddress) references User(emailAddress)
 );
 
 create table Ticket(
-    ticketID int primary key auto_increment,
-    purchaseID int,
-    performanceTimingID int,
-    ticketPrice decimal(5, 2),
-    foreign key (PurchaseID) references Purchase(purchaseID)
+    	ticketID int primary key auto_increment,
+    	purchaseID int,
+    	performanceTimingID int,
+    	ticketPrice decimal(5, 2) not null,
+    	foreign key (purchaseID) references Purchase(purchaseID) on delete cascade,
+    	foreign key (performanceTimingID) references PerformanceTiming(performanceTimingID) on delete cascade
 );
 
 create table Language(
-	languageID INT PRIMARY KEY auto_increment,
+	languageID int primary key auto_increment,
 	languageOption VARCHAR(30)
+	constraint langOptCheck check (languageOption) in ('English', 'Multiple Languages', 'No Languages')
 );
 
 create table Performance(
-	    performanceID int primary key auto_increment,
-    	performanceTypeID INT,
+	performanceID int primary key auto_increment,
+    	performanceTypeID int,
      	languageID int,
-    	foreign key (performanceTypeID) references PerformanceType(performanceTypeID),
+    	title varchar(100) not null,
+    	description varchar(1000) not null,
+    	hasLiveMusic boolean not null,
+	imageUrl varchar(10000) not null,
+	foreign key (performanceTypeID) references PerformanceType(performanceTypeID),
     	foreign key (languageID) references Language(languageID),
-    	title varchar(100),
-    	description varchar(1000),
-    	hasLiveMusic boolean,
-	    imageUrl varchar(10000)
-	    constraint urlCheck check (imageUrl like '%http_%')
+	constraint urlCheck check (imageUrl like '%http_%')
 );
 
 create table PerformanceTiming(
-	performanceTimingID INT PRIMARY KEY auto_increment,
-	performanceID INT,
-	dateTimeOfPerformance DATETIME,
-	duration TIME,
+	performanceTimingID int primary key auto_increment,
+	performanceID int,
+	dateTimeOfPerformance dateTime,
+	duration time,
 	foreign key (performanceID) references performance(performanceID) on delete cascade
-
 );
 
 create table SeatTypePrice(
-    seatTypePriceID INT AUTO_INCREMENT primary key,
-    performanceTimingID INT,
-    seatType VARCHAR(100),
-	  constraint seatType check (seatType in ('stalls', 'circle')),
-    seatAmount INT,
-    seatPrice decimal(5,2),
-    foreign key (performanceTimingID) references PerformanceTiming(performanceTimingID)
+    	seatTypePriceID int primary key auto_increment,
+    	performanceTimingID int,
+    	seatType VARCHAR(100) not null,
+    	seatAmount int not null,
+    	seatPrice decimal(5,2) not null,
+    	foreign key (performanceTimingID) references PerformanceTiming(performanceTimingID) on delete cascade,
+	constraint seatType check (seatType in ('stalls', 'circle'))
 );
 
 -- procedures for inserting data into tables
