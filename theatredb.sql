@@ -73,7 +73,7 @@ create table SeatTypePrice(
 -- procedures for inserting data into tables
 delimiter / 
 create procedure insertUser
-				(in aEmailAddress varchar(50), in aPassword varchar(50), in aDOB date, in aAddress varchar(100))
+				(in aEmailAddress varchar(100), in aPassword varchar(50), in aDOB date, in aAddress varchar(100))
 	begin
         insert into User (emailAddress, password, DOB, homeAddress) values (aEmailAddress, aPassword, aDOB, aAddress);
 	end; 
